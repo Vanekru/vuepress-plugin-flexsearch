@@ -26,38 +26,82 @@ module.exports = {
    *
    * ref：https://v1.vuepress.vuejs.org/theme/default-theme-config.html
    */
+  locales: {
+    '/ru/': {
+      lang: 'ru-RU',
+      title: 'Keitaro',
+      description: ''
+    },
+    '/en/': {
+      lang: 'en-US',
+      title: 'Keitaro',
+      description: ''
+    }
+  },
   themeConfig: {
     repo: '',
     editLinks: false,
     docsDir: '',
     editLinkText: '',
     lastUpdated: false,
-    nav: [
-      {
-        text: 'Guide',
-        link: '/guide/',
+    locales: {
+      '/ru/': {
+        sidebar: {
+          '/ru/guide/': [
+            {
+              title: 'Гайд',
+              collapsable: false,
+              children: [
+                '',
+                'using-vue',
+              ]
+            }
+          ],
+        },
+        nav: [
+          {
+            text: 'Guide',
+            link: '/ru/guide/',
+          },
+          {
+            text: 'Config',
+            link: '/config/'
+          },
+          {
+            text: 'VuePress',
+            link: 'https://v1.vuepress.vuejs.org'
+          }
+        ],
       },
-      {
-        text: 'Config',
-        link: '/config/'
+      '/en/': {
+        sidebar: {
+          '/en/guide/': [
+            {
+              title: 'Guide',
+              collapsable: false,
+              children: [
+                '',
+                'using-vue',
+              ]
+            }
+          ],
+        },
+        nav: [
+          {
+            text: 'Guide',
+            link: '/en/guide/',
+          },
+          {
+            text: 'Config',
+            link: '/config/'
+          },
+          {
+            text: 'VuePress',
+            link: 'https://v1.vuepress.vuejs.org'
+          }
+        ],
       },
-      {
-        text: 'VuePress',
-        link: 'https://v1.vuepress.vuejs.org'
-      }
-    ],
-    sidebar: {
-      '/guide/': [
-        {
-          title: 'Guide',
-          collapsable: false,
-          children: [
-            '',
-            'using-vue',
-          ]
-        }
-      ],
-    }
+    },
   },
 
   /**

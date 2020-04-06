@@ -54,7 +54,10 @@ export default {
       focused: false,
       focusIndex: 0,
       placeholder: undefined,
-      index: null
+      index: null,
+      indexEn: null,
+      indexRu: null,
+      lang: 'en-US'
     }
   },
 
@@ -63,6 +66,12 @@ export default {
     document.addEventListener('keydown', this.onHotkey)
 
     this.setupFlexSearch()
+    this.index = this.indexEn
+    if (this.$lang !== 'en-US') {
+      this.index = this.indexRu
+    }
+    this.lang = this.$lang;
+
   },
 
   beforeDestroy () {
@@ -175,24 +184,51 @@ export default {
     },
 
     setupFlexSearch () {
-      let defaultOptions = {
+      let defaultOptionsEn = {
         encode: "extra",
         tokenize: "full",
         threshold: 1,
         resolution: 3
       }
-      let options = this.$site.themeConfig.flexSearchOptions || defaultOptions
+      let optionsEn = this.$site.themeConfig.flexSearchOptions || defaultOptionsEn
 
-      options = {
-        ...options,
+      let defaultOptionsRu = {
+        encode: false,
+        rtl: true,
+        split: /\s+/,
+        tokenize: "forward"
+      }
+      let optionsRu = this.$site.themeConfig.flexSearchOptions || defaultOptionsRu
+
+      const doc = {
+        id: "key",
+        field: ["title", "content"]
+      }
+
+      optionsEn = {
+        ...optionsEn,
         doc: {
-          id: "key",
-          field: ["title", "content"]
+          ...doc
         }
       }
-      this.index = new Flexsearch(options);
+
+      optionsRu = {
+        ...optionsRu,
+        doc: {
+          ...doc
+        }
+      }
+
+
+      this.indexEn = new Flexsearch(optionsEn);
+      this.indexRu = new Flexsearch(optionsRu);
       const { pages } = this.$site;
-      this.index.add(pages);
+      this.indexEn.add(pages);
+      this.indexRu.add(pages);
+    },
+
+    escapeRegExp(str) {
+      return str.replace(/[-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     },
 
     getQuerySnippet (page) {
@@ -201,11 +237,11 @@ export default {
       const endIndex = queryPosition + 30
       let querySnippet = page.content.slice(startIndex, endIndex)
         .toLowerCase()
-        .replace(/[\W_]+/g, " ")
+        .replace(/[^a-zA-Z0-9а-яА-Я ]+/g, " ")
 
-      const queryWords = this.query.split(' ').filter((v, i, a) => !!v && a.indexOf(v) === i); 
+      const queryWords = this.query.split(' ').filter((v, i, a) => !!v && a.indexOf(v) === i);
       for (const word of queryWords) {
-        querySnippet = querySnippet.replace(new RegExp(word, 'gi'), `<strong class="text--primary">${word}</strong>`)
+        querySnippet = querySnippet.replace(new RegExp(this.escapeRegExp(word), 'gi'), `<strong class="text--primary">${word}</strong>`)
       }
 
       if (querySnippet) {
@@ -214,7 +250,17 @@ export default {
         return page.title
       }
     },
-
+  },
+  watch:{
+    $route () {
+      if (this.$lang !== this.lang) {
+        this.index = this.indexEn
+        if (this.$lang !== 'en-US') {
+          this.index = this.indexRu
+        }
+        this.lang = this.$lang
+      }
+    }
   }
 }
 </script>
